@@ -1,22 +1,66 @@
+import 'package:dev_store/components/badge_label.dart';
 import 'package:dev_store/components/product_grid.dart';
-import 'package:dev_store/models/product.dart';
-import 'package:dev_store/models/product_list.dart';
+import 'package:dev_store/models/cart.dart';
+import 'package:dev_store/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ProductsOverviewScreen extends StatelessWidget {
+enum FilterOptions { all, favorites }
+
+class ProductsOverviewScreen extends StatefulWidget {
   const ProductsOverviewScreen({super.key});
 
   @override
+  State<ProductsOverviewScreen> createState() => _ProductsOverviewScreenState();
+}
+
+class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
+  @override
   Widget build(BuildContext context) {
-    final productListProvider = Provider.of<ProductList>(context);
-    final List<Product> loadProducts = productListProvider.products;
+    bool showFavoritesOnly = false;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Minha Loja'),
+        actions: [
+          Consumer<Cart>(
+            child: IconButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(AppRoutes.CART);
+              },
+              icon: const Icon(Icons.shopping_cart),
+            ),
+            builder: (ctx, cart, child) => BadgeLabel(
+              value: cart.itemsCount.toString(),
+              child: child!,
+            ),
+          ),
+          PopupMenuButton(
+            itemBuilder: (_) => [
+              const PopupMenuItem(
+                value: FilterOptions.favorites,
+                child: Text('Somente Favoritos'),
+              ),
+              const PopupMenuItem(
+                value: FilterOptions.all,
+                child: Text('Todos'),
+              ),
+            ],
+            onSelected: (value) {
+              setState(() {
+                if (value == FilterOptions.favorites) {
+                  showFavoritesOnly = true;
+                } else {
+                  showFavoritesOnly = false;
+                }
+              });
+            },
+          )
+        ],
       ),
-      body: ProductGrid(),
+      body: ProductGrid(
+        showFavoriteProducts: showFavoritesOnly,
+      ),
     );
   }
 }

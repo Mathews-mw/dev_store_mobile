@@ -11,6 +11,10 @@ class ProductList with ChangeNotifier {
     ]; // retornar uma cópia de _items ao invés de apontar para a referência original da lista
   }
 
+  List<Product> get favoriteProducts {
+    return _items.where((product) => product.isFavorite).toList();
+  }
+
   void addProduct(Product product) {
     _items.add(product);
     notifyListeners(); // Notifica aos subscribers que houve uma modificação nos dados dessa classe;
