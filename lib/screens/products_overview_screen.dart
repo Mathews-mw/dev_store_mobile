@@ -1,3 +1,4 @@
+import 'package:dev_store/components/app_drawer.dart';
 import 'package:dev_store/components/badge_label.dart';
 import 'package:dev_store/components/product_grid.dart';
 import 'package:dev_store/models/cart.dart';
@@ -58,9 +59,8 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           )
         ],
       ),
-      body: ProductGrid(
-        showFavoriteProducts: showFavoritesOnly,
-      ),
+      body: ProductGrid(showFavoriteProducts: showFavoritesOnly),
+      drawer: AppDrawer(),
     );
   }
 }

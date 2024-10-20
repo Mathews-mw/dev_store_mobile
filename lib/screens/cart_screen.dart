@@ -1,5 +1,6 @@
 import 'package:dev_store/components/cart_product_item.dart';
 import 'package:dev_store/models/cart.dart';
+import 'package:dev_store/models/order_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,9 +19,9 @@ class CartScreen extends StatelessWidget {
       body: Column(
         children: [
           Card(
-            margin: const EdgeInsets.all(20),
+            margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
             child: Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -42,7 +43,12 @@ class CartScreen extends StatelessWidget {
                       textStyle: TextStyle(
                           color: Theme.of(context).colorScheme.primary),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Provider.of<OrderList>(context, listen: false)
+                          .addOrder(cart);
+
+                      cart.clear();
+                    },
                     child: const Text('COMPRAR'),
                   ),
                 ],
