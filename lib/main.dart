@@ -5,6 +5,7 @@ import 'package:dev_store/screens/cart_screen.dart';
 import 'package:dev_store/screens/orders_screen.dart';
 import 'package:dev_store/screens/product_details_screen.dart';
 import 'package:dev_store/screens/products_overview_screen.dart';
+import 'package:dev_store/screens/products_screen.dart';
 import 'package:dev_store/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -48,9 +49,10 @@ class MyApp extends StatelessWidget {
         // home: ProductsOverviewScreen(),
         routes: {
           AppRoutes.HOME: (ctx) => const ProductsOverviewScreen(),
-          AppRoutes.PRODUCT_DETAILS: (ctx) => const ProductDetailsScreen(),
           AppRoutes.CART: (ctx) => const CartScreen(),
           AppRoutes.ORDERS: (ctx) => const OrdersScreen(),
+          AppRoutes.PRODUCTS: (ctx) => const ProductsScreen(),
+          AppRoutes.PRODUCT_DETAILS: (ctx) => const ProductDetailsScreen(),
         },
         debugShowCheckedModeBanner: false,
       ),

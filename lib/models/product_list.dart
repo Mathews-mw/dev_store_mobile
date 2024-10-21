@@ -11,6 +11,10 @@ class ProductList with ChangeNotifier {
     ]; // retornar uma cópia de _items ao invés de apontar para a referência original da lista
   }
 
+  int get itemsCount {
+    return _items.length;
+  }
+
   List<Product> get favoriteProducts {
     return _items.where((product) => product.isFavorite).toList();
   }
