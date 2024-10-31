@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:dev_store/data/dummy_data.dart';
 import 'package:dev_store/models/product.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class ProductList with ChangeNotifier {
+  final _dbBaseUrl = 'https://shop-coder-8a8b3-default-rtdb.firebaseio.com';
   final List<Product> _items = dummyProducts;
 
   List<Product> get products {
@@ -40,6 +43,18 @@ class ProductList with ChangeNotifier {
 
   void insertOnProductList(Product product) {
     _items.add(product);
+
+    http.post(
+      Uri.parse('$_dbBaseUrl/products.json'),
+      body: jsonEncode({
+        "title": product.title,
+        "description": product.description,
+        "price": product.price,
+        "imageUrl": product.imageUrl,
+        "isFavorite": product.isFavorite
+      }),
+    );
+
     notifyListeners(); // Notifica aos subscribers que houve uma modificação nos dados dessa classe;
   }
 
