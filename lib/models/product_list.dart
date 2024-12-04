@@ -1,14 +1,14 @@
-import 'dart:convert';
 import 'dart:math';
-
-import 'package:dev_store/data/dummy_data.dart';
-import 'package:dev_store/models/product.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:dev_store/models/product.dart';
+
 class ProductList with ChangeNotifier {
-  final _dbBaseUrl = 'https://shop-coder-8a8b3-default-rtdb.firebaseio.com';
-  final List<Product> _items = dummyProducts;
+  final _dbBaseUrl =
+      'https://shop-coder-8a8b3-default-rtdb.firebaseio.com/products.json';
+  final List<Product> _items = [];
 
   List<Product> get products {
     return [
@@ -24,7 +24,30 @@ class ProductList with ChangeNotifier {
     return _items.where((product) => product.isFavorite).toList();
   }
 
-  void saveProduct(Map<String, Object> data) {
+  Future<void> loadProducts() async {
+    _items.clear();
+
+    final response = await http.get(Uri.parse(_dbBaseUrl));
+
+    if (response.body == 'null') return;
+
+    Map<String, dynamic> data = jsonDecode(response.body);
+
+    data.forEach((productId, productData) {
+      _items.add(Product(
+        id: productId,
+        title: productData['title'],
+        description: productData['description'],
+        price: productData['price'],
+        imageUrl: productData['imageUrl'],
+        isFavorite: productData['isFavorite'],
+      ));
+    });
+
+    notifyListeners();
+  }
+
+  Future<void> saveProduct(Map<String, Object> data) {
     bool hasId = data['id'] != null;
 
     final product = Product(
@@ -35,17 +58,15 @@ class ProductList with ChangeNotifier {
         imageUrl: data['imageUrl'] as String);
 
     if (hasId) {
-      updateProduct(product);
+      return updateProduct(product);
     } else {
-      insertOnProductList(product);
+      return insertOnProductList(product);
     }
   }
 
-  void insertOnProductList(Product product) {
-    _items.add(product);
-
-    http.post(
-      Uri.parse('$_dbBaseUrl/products.json'),
+  Future<void> insertOnProductList(Product product) async {
+    final response = await http.post(
+      Uri.parse(_dbBaseUrl),
       body: jsonEncode({
         "title": product.title,
         "description": product.description,
@@ -55,16 +76,29 @@ class ProductList with ChangeNotifier {
       }),
     );
 
-    notifyListeners(); // Notifica aos subscribers que houve uma modificação nos dados dessa classe;
+    final id = jsonDecode(response.body)['name'];
+
+    _items.add(Product(
+      id: id,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      isFavorite: product.isFavorite,
+    ));
+
+    notifyListeners();
   }
 
-  void updateProduct(Product product) {
+  Future<void> updateProduct(Product product) {
     final index = _items.indexWhere((item) => item.id == product.id);
 
     if (index >= 0) {
       _items[index] = product;
-      notifyListeners();
+      notifyListeners(); // Notifica aos subscribers que houve uma modificação nos dados dessa classe;
     }
+
+    return Future.value();
   }
 
   void removeProduct(Product product) {

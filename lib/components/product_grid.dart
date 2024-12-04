@@ -13,8 +13,6 @@ class ProductGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final productListProvider = Provider.of<ProductList>(context);
 
-    print(showFavoriteProducts);
-
     final List<Product> loadProducts = showFavoriteProducts
         ? productListProvider.favoriteProducts
         : productListProvider.products;

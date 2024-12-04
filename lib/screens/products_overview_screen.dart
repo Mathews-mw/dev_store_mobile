@@ -2,6 +2,7 @@ import 'package:dev_store/components/app_drawer.dart';
 import 'package:dev_store/components/badge_label.dart';
 import 'package:dev_store/components/product_grid.dart';
 import 'package:dev_store/models/cart.dart';
+import 'package:dev_store/models/product_list.dart';
 import 'package:dev_store/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,10 +17,32 @@ class ProductsOverviewScreen extends StatefulWidget {
 }
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
+  bool _showFavoritesOnly = false;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    Provider.of<ProductList>(context, listen: false)
+        .loadProducts()
+        .then((value) {
+      setState(() {
+        _isLoading = false;
+      });
+    }).catchError((error) {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool showFavoritesOnly = false;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Minha Loja'),
@@ -50,16 +73,20 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
             onSelected: (value) {
               setState(() {
                 if (value == FilterOptions.favorites) {
-                  showFavoritesOnly = true;
+                  _showFavoritesOnly = true;
                 } else {
-                  showFavoritesOnly = false;
+                  _showFavoritesOnly = false;
                 }
               });
             },
           )
         ],
       ),
-      body: ProductGrid(showFavoriteProducts: showFavoritesOnly),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : ProductGrid(showFavoriteProducts: _showFavoritesOnly),
       drawer: AppDrawer(),
     );
   }
